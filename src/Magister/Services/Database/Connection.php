@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use Magister\Services\Database\Query\Builder;
 use Magister\Services\Contracts\Events\Dispatcher;
 use Magister\Services\Database\Query\Processors\Processor;
+use Magister\Services\Database\Query\Builder as QueryBuilder;
 
 /**
  * Class Connection
