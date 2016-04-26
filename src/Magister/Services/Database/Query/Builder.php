@@ -35,13 +35,6 @@ class Builder
     protected $from;
 
     /**
-     * The where constraints for the query.
-     *
-     * @var array
-     */
-    public $wheres;
-
-    /**
      * The current query value bindings.
      *
      * @var array
@@ -49,6 +42,13 @@ class Builder
     protected $bindings = [
         'where'  => [],
     ];
+
+    /**
+     * The where constraints for the query.
+     *
+     * @var array
+     */
+    public $wheres;
 
     /**
      * Create a new query builder instance.
@@ -73,60 +73,6 @@ class Builder
         $this->from = $query;
 
         return $this;
-    }
-
-    /**
-     * Get an array with the values of a given column.
-     *
-     * @param string $column
-     * @param string $key
-     * @return array
-     */
-    public function lists($column, $key = null)
-    {
-        $columns = $this->getListSelect($column, $key);
-
-        $results = new Collection($this->get());
-
-        return $results->lists($columns[0], array_get($columns, 1));
-    }
-
-    /**
-     * Get the columns that should be used in a lists array.
-     *
-     * @param string $column
-     * @param string $key
-     * @return array
-     */
-    protected function getListSelect($column, $key)
-    {
-        $select = is_null($key) ? [$column] : [$column, $key];
-
-        return array_map(function ($column) {
-            $dot = strpos($column, '.');
-
-            return $dot === false ? $column : substr($column, $dot + 1);
-        }, $select);
-    }
-
-    /**
-     * Execute the query as a select statement.
-     *
-     * @return array
-     */
-    public function get()
-    {
-        return $this->processor->process($this, $this->runSelect());
-    }
-
-    /**
-     * Run the query as a select statement against the connection.
-     *
-     * @return array
-     */
-    protected function runSelect()
-    {
-        return $this->connection->select($this->from, $this->getBindings());
     }
 
     /**
@@ -172,6 +118,60 @@ class Builder
     }
 
     /**
+     * Execute the query as a select statement.
+     *
+     * @return array
+     */
+    public function get()
+    {
+        return $this->processor->process($this, $this->runSelect());
+    }
+
+    /**
+     * Run the query as a select statement against the connection.
+     *
+     * @return array
+     */
+    protected function runSelect()
+    {
+        return $this->connection->select($this->from, $this->getBindings());
+    }
+
+    /**
+     * Get an array with the values of a given column.
+     *
+     * @param string $column
+     * @param string $key
+     * @return array
+     */
+    public function lists($column, $key = null)
+    {
+        $columns = $this->getListSelect($column, $key);
+
+        $results = new Collection($this->get());
+
+        return $results->lists($columns[0], array_get($columns, 1));
+    }
+
+    /**
+     * Get the columns that should be used in a lists array.
+     *
+     * @param string $column
+     * @param string $key
+     * @return array
+     */
+    protected function getListSelect($column, $key)
+    {
+        $select = is_null($key) ? [$column] : [$column, $key];
+
+        return array_map(function ($column) {
+            $dot = strpos($column, '.');
+
+            return $dot === false ? $column : substr($column, $dot + 1);
+        }, $select);
+    }
+
+    /**
      * Insert a new record into the database.
      *
      * @param array $values
@@ -201,6 +201,39 @@ class Builder
         }
 
         return $this->connection->insert($this->from, $bindings);
+    }
+
+    /**
+     * Update a record in the database.
+     *
+     * @param array $values
+     * @return int
+     */
+    public function update(array $values)
+    {
+        $bindings = array_values(array_merge($values, $this->getBindings()));
+
+        return $this->connection->update($sql, $bindings);
+    }
+
+    /**
+     * Delete a record from the database.
+     *
+     * @return int
+     */
+    public function delete()
+    {
+        return $this->connection->delete($sql, $this->getBindings());
+    }
+
+    /**
+     * Get a new instance of the query builder.
+     *
+     * @return \Magister\Services\Database\Query\Builder
+     */
+    public function newQuery()
+    {
+        return new static($this->connection, $this->processor);
     }
 
     /**

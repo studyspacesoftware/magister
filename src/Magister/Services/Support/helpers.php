@@ -341,30 +341,3 @@ if (! function_exists('get_random_bytes')) {
         return $bytes;
     }
 }
-
-if (! function_exists('process')) {
-    /**
-     * Process the selected results.
-     *
-     * @param array $results
-     * @return array
-     */
-    function process($results)
-    {
-        if (! isset($results) || isset($results['Fouttype'])) {
-            return [];
-        }
-
-        if (array_has($results, 'Items') || array_has($results, 'items')) {
-            return reset($results);
-        }
-
-        foreach ($results as $result) {
-            if (! is_array($result)) {
-                return [$results];
-            }
-        }
-
-        return $results;
-    }
-}

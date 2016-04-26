@@ -27,7 +27,7 @@ class Connection implements ConnectionInterface
      *
      * @var \Magister\Services\Database\Query\Processors\Processor
      */
-    protected $processor;
+    protected $postProcessor;
 
     /**
      * The event dispatcher instance.
@@ -51,6 +51,13 @@ class Connection implements ConnectionInterface
     protected $loggingQueries = false;
 
     /**
+     * Indicates if the connection is in a "dry run".
+     *
+     * @var bool
+     */
+    protected $pretending = false;
+
+    /**
      * Create a new connection instance.
      *
      * @param \GuzzleHttp\Client $client
@@ -59,22 +66,50 @@ class Connection implements ConnectionInterface
     {
         $this->client = $client;
 
-        $this->useDefaultProcessor();
+        $this->useDefaultPostProcessor();
     }
 
     /**
-     * Start a query against the server.
+     * Use the default processor.
+     *
+     * @return void
+     */
+    public function useDefaultPostProcessor()
+    {
+        $this->postProcessor = $this->setDefaultPostProcessor();
+    }
+
+    /**
+     * Set the default processor.
+     *
+     * @return \Magister\Services\Database\Query\Processors\Processor
+     */
+    public function setDefaultPostProcessor()
+    {
+        return new Processor;
+    }
+
+    /**
+     * Start a query against the database.
      *
      * @param string $query
      * @return \Magister\Services\Database\Query\Builder
      */
-    public function query($query)
+    public function table($query)
     {
-        $processor = $this->getProcessor();
+        return $this->query()->from($table);
+    }
 
-        $builder = new Builder($this, $processor);
-
-        return $builder->from($query);
+    /**
+     * Get a new query builder instance.
+     *
+     * @return \Magister\Services\Database\Query\Builder
+     */
+    public function query()
+    {
+        return new QueryBuilder(
+            $this, $this->getPostProcessor()
+        );
     }
 
     /**
@@ -87,11 +122,15 @@ class Connection implements ConnectionInterface
     public function select($query, $bindings = [])
     {
         return $this->run($query, $bindings, function ($me, $query, $bindings) {
-            list($query, $bindings) = $me->prepareBindings($query, $bindings);
+            if ($me->pretending()) {
+                return [];
+            }
 
             // For select statements, we'll simply execute the query and return an array
             // of the result set. Each element in the array will be a single
             // row from the response, and will either be an array or objects.
+            list($query, $bindings) = $me->prepareBindings($query, $bindings);
+             
             $statement = $me->getClient()->get($query, ['query' => $bindings]);
 
             return $statement->json();
@@ -111,7 +150,31 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Execute an SQL statement and return the boolean result.
+     * Run an update statement against the database.
+     *
+     * @param string $query
+     * @param array $bindings
+     * @return int
+     */
+    public function update($query, $bindings = [])
+    {
+        return $this->affectingStatement($query, $bindings);
+    }
+
+    /**
+     * Run a delete statement against the database.
+     *
+     * @param string $query
+     * @param array $bindings
+     * @return int
+     */
+    public function delete($query, $bindings = [])
+    {
+        return $this->affectingStatement($query, $bindings);
+    }
+
+    /**
+     * Execute an statement and return the boolean result.
      *
      * @param string $query
      * @param array $bindings
@@ -120,7 +183,11 @@ class Connection implements ConnectionInterface
     public function statement($query, $bindings = [])
     {
         return $this->run($query, $bindings, function ($me, $query, $bindings) {
-            dump('Hell Yeah!');
+            if ($me->pretending()) {
+                return true;
+            }
+
+            // TODO
         });
     }
 
@@ -144,6 +211,34 @@ class Connection implements ConnectionInterface
         }
 
         return [$query, $bindings];
+    }
+
+    /**
+     * Execute the given callback in "dry run" mode.
+     *
+     * @param \Closure $callback
+     * @return array
+     */
+    public function pretend(Closure $callback)
+    {
+        $loggingQueries = $this->loggingQueries;
+
+        $this->enableQueryLog();
+
+        $this->pretending = true;
+
+        $this->queryLog = [];
+
+        // Basically to make the database connection "pretend", we will just return
+        // the default values for all the query methods, then we will return an
+        // array of queries that were "executed" within the Closure callback.
+        $callback($this);
+
+        $this->pretending = false;
+
+        $this->loggingQueries = $loggingQueries;
+        
+        return $this->queryLog;
     }
 
     /**
@@ -196,78 +291,6 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Set the default processor.
-     *
-     * @return \Magister\Services\Database\Query\Processors\Processor
-     */
-    public function setDefaultProcessor()
-    {
-        return new Processor();
-    }
-
-    /**
-     * Use the default processor.
-     *
-     * @return void
-     */
-    public function useDefaultProcessor()
-    {
-        $this->processor = $this->setDefaultProcessor();
-    }
-
-    /**
-     * Set the processor used by the connection.
-     *
-     * @param \Magister\Services\Database\Query\Processors\Processor $processor
-     * @return void
-     */
-    public function setProcessor(Processor $processor)
-    {
-        $this->processor = $processor;
-    }
-
-    /**
-     * Get the processor used by the connection.
-     *
-     * @return \Magister\Services\Database\Query\Processors\Processor
-     */
-    public function getProcessor()
-    {
-        return $this->processor;
-    }
-
-    /**
-     * Set the event dispatcher instance on the connection.
-     *
-     * @param \Magister\Services\Contracts\Events\Dispatcher $events
-     * @return void
-     */
-    public function setEventDispatcher(Dispatcher $events)
-    {
-        $this->events = $events;
-    }
-
-    /**
-     * Get the event dispatcher used by the connection.
-     *
-     * @return \Magister\Services\Contracts\Events\Dispatcher
-     */
-    public function getEventDispatcher()
-    {
-        return $this->events;
-    }
-
-    /**
-     * Get the current client.
-     *
-     * @return \GuzzleHttp\Client
-     */
-    public function getClient()
-    {
-        return $this->client;
-    }
-
-    /**
      * Log a query in the connection's query log.
      *
      * @param string $query
@@ -287,6 +310,7 @@ class Connection implements ConnectionInterface
 
         $this->queryLog[] = compact('query', 'bindings', 'time');
     }
+
     /**
      * Register a database query listener with the connection.
      *
@@ -309,6 +333,68 @@ class Connection implements ConnectionInterface
     protected function getElapsedTime($start)
     {
         return round((microtime(true) - $start) * 1000, 2);
+    }
+
+    /**
+     * Get the processor used by the connection.
+     *
+     * @return \Magister\Services\Database\Query\Processors\Processor
+     */
+    public function getPostProcessor()
+    {
+        return $this->postProcessor;
+    }
+
+    /**
+     * Set the processor used by the connection.
+     *
+     * @param \Magister\Services\Database\Query\Processors\Processor $processor
+     * @return void
+     */
+    public function setProcessor(Processor $processor)
+    {
+        $this->postProcessor = $processor;
+    }
+
+    /**
+     * Get the event dispatcher used by the connection.
+     *
+     * @return \Magister\Services\Contracts\Events\Dispatcher
+     */
+    public function getEventDispatcher()
+    {
+        return $this->events;
+    }
+
+    /**
+     * Set the event dispatcher instance on the connection.
+     *
+     * @param \Magister\Services\Contracts\Events\Dispatcher $events
+     * @return void
+     */
+    public function setEventDispatcher(Dispatcher $events)
+    {
+        $this->events = $events;
+    }
+
+    /**
+     * Determine if the connection in a "dry run".
+     *
+     * @return bool
+     */
+    public function pretending()
+    {
+        return $this->pretending === true;
+    }
+
+    /**
+     * Get the current client.
+     *
+     * @return \GuzzleHttp\Client
+     */
+    public function getClient()
+    {
+        return $this->client;
     }
 
     /**
