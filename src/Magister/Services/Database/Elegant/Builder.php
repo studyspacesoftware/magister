@@ -62,7 +62,7 @@ class Builder
      * Find a model by its primary key.
      *
      * @param array $ids
-     * @return \Illuminate\Database\Elegant\Collection
+     * @return \Magister\Services\Database\Elegant\Collection
      */
     public function findMany($ids)
     {
