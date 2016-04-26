@@ -1,7 +1,8 @@
 ## Magister API
-[![Build Status](https://scrutinizer-ci.com/g/Stanvk/Magister/badges/build.png?b=3.0.0)](https://scrutinizer-ci.com/g/Stanvk/Magister/build-status/master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Stanvk/Magister/badges/quality-score.png?b=3.0.0)](https://scrutinizer-ci.com/g/Stanvk/Magister/?branch=master)
+[![StyleCI](https://styleci.io/repos/29094110/shield?style=flat)](https://styleci.io/repos/29094110)
+[![Build Status](https://scrutinizer-ci.com/g/Stanvk/Magister/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Stanvk/Magister/build-status/master)
 [![Magister Version Support](https://img.shields.io/badge/Magister-6.1.0-brightgreen.svg)](https://packagist.org/packages/stanvk/magister)
+[![Total Downloads](https://poser.pugx.org/stanvk/magister/downloads)](https://packagist.org/packages/stanvk/magister)
 [![Latest Stable Version](https://poser.pugx.org/stanvk/magister/v/stable.svg)](https://packagist.org/packages/stanvk/magister)
 [![License](https://poser.pugx.org/stanvk/magister/license.svg)](https://packagist.org/packages/stanvk/magister)
 
