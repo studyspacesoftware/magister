@@ -7,7 +7,7 @@ return [
      | Encryption Key
      |--------------------------------------------------------------------------
      */
-    'key' => 'jXLsIlz46VNSysjOoAdZR55twlyNiTEI',
+    'key' => 'uOVw0b8eTFFtAzfCzDbtkxtNIOvPkUyI',
 
     /*
      |--------------------------------------------------------------------------

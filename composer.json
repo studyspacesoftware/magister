@@ -1,6 +1,8 @@
 {
     "name": "stanvk/magister",
     "description": "An eloquent API for Schoolmaster BV's Magister 6",
+    "keywords": ["api", "magister"],
+    "homepage": "http://magister-api.nl",
     "license": "MIT",
     "authors": [
         {
@@ -13,7 +15,7 @@
     "require": {
         "php": ">=5.4.0",
         "guzzlehttp/guzzle": "~5.0",
-        "guzzlehttp/cache-subscriber": "0.1.*",
+        "guzzlehttp/cache-subscriber": "0.1.*"
     },
     "require-dev": {
         "symfony/var-dumper": "^2.7"
@@ -26,5 +28,9 @@
             "Magister\\": "src/Magister"
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "scripts": {
+        "post-install-cmd": "Magister\\Services\\Foundation\\ComposerScripts::postInstall",
+        "post-update-cmd": "Magister\\Services\\Foundation\\ComposerScripts::postUpdate"
+    }
 }
