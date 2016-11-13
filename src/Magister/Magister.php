@@ -15,6 +15,11 @@ use Magister\Services\Support\ServiceProvider;
  */
 class Magister extends Container implements ApplicationContract
 {
+    private $id;
+
+    public function setId($id) { $this->id = $id; }
+    public function getId() { return $this->id; }
+
     /**
      * The API version.
      *
@@ -44,13 +49,13 @@ class Magister extends Container implements ApplicationContract
     protected $serviceProviders = [];
 
     /**
-     * Create a new Magister instance.
+     * Starts a new Magister instance.
      *
      * @param string $school
      * @param string $username
      * @param string $password
      */
-    public function __construct($school, $username = null, $password = null)
+    public function start($school, $username = null, $password = null)
     {
         $kernel = new Kernel($this);
 
