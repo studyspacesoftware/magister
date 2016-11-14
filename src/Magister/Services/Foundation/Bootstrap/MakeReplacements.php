@@ -22,10 +22,13 @@ class MakeReplacements
     {
         if ($app->auth->check()) {
             $id = $app->getId();
-            if($id == null) { $id = User::profile()->Id; }
-
-            $app->config->replace('url', 'id', $id);
-//            $app->config->replace('url', 'enrollment', Enrollment::current()->Id);
+            if($id == null) {
+                $id = User::profile()->Id;
+                $app->config->replace('url', 'id', $id);
+                $app->config->replace('url', 'enrollment', Enrollment::current()->Id);
+            } else {
+                $app->config->replace('url', 'id', $id);
+            }
         }
     }
 }
