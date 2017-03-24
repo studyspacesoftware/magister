@@ -28,6 +28,7 @@ class MakeReplacements
                 if(Enrollment::current() != null) $app->config->replace('url', 'enrollment', Enrollment::current()->Id);
             } else {
                 $app->config->replace('url', 'id', $id);
+                if(Enrollment::current() != null) $app->config->replace('url', 'enrollment', Enrollment::current()->Id);
             }
         }
     }
