@@ -63,7 +63,7 @@ return [
      | Grade
      |--------------------------------------------------------------------------
      */
-    'grade' => 'personen/:id/aanmeldingen/:enrollment/cijfers/cijferoverzichtvooraanmelding',
+    'grade' => 'personen/:id/aanmeldingen/:enrollment/cijfers/cijferoverzichtvooraanmelding?actievePerioden=:actievePerioden',
 
     /*
      |--------------------------------------------------------------------------
