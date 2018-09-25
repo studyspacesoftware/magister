@@ -55,11 +55,9 @@ class Magister extends Container implements ApplicationContract
      * @param string $username
      * @param string $password
      */
-    public function start($apiKey, $school, $username = null, $password = null)
+    public function start($apiKey)
     {
         $kernel = new Kernel($this);
-
-        $this->registerBaseBindings($apiKey, $school, $username, $password);
 
         $this->bindPathsInContainer();
 
