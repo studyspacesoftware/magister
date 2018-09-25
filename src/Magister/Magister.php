@@ -86,16 +86,10 @@ class Magister extends Container implements ApplicationContract
      *
      * @return void
      */
-    protected function registerBaseBindings($apikey, $school, $username, $password)
+    protected function registerBaseBindings($apikey)
     {
         $this->bind('app', $this);
         $this->bind('apikey', $apikey);
-
-        $this->setSchool($school);
-
-        if ($username && $password) {
-            $this->setCredentials($username, $password);
-        }
     }
 
     /**
