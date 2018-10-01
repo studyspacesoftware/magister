@@ -20,16 +20,14 @@ class MakeReplacements
      */
     public function bootstrap(Magister $app)
     {
-        if ($app->auth->check()) {
-            $id = $app->getId();
-            if($id == null) {
-                $id = User::profile()->Persoon['Id'];
-                $app->config->replace('url', 'id', $id);
-                if(Enrollment::current() != null) $app->config->replace('url', 'enrollment', Enrollment::current()->Id);
-            } else {
-                $app->config->replace('url', 'id', $id);
-                if(Enrollment::current() != null) $app->config->replace('url', 'enrollment', Enrollment::current()->Id);
-            }
+        $id = $app->getId();
+        if($id == null) {
+            $id = User::profile()->Persoon['Id'];
+            $app->config->replace('url', 'id', $id);
+            if(Enrollment::current() != null) $app->config->replace('url', 'enrollment', Enrollment::current()->Id);
+        } else {
+            $app->config->replace('url', 'id', $id);
+            if(Enrollment::current() != null) $app->config->replace('url', 'enrollment', Enrollment::current()->Id);
         }
     }
 }
