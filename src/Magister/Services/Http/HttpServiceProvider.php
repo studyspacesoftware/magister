@@ -31,7 +31,6 @@ class HttpServiceProvider extends ServiceProvider
         $this->app->singleton('http', function ($app) {
             $client = new Client(['base_url' => "https://{$app['school']}.{$app['apidomain']}/api/"]);
 
-            $client->setDefaultOption('exceptions', false);
             $client->setDefaultOption('headers/Authorization', 'Bearer '.$app['apikey']);
 
             $client->setDefaultOption('cookies', new SessionCookieJar($app['cookie']));
