@@ -37,6 +37,9 @@ class HttpServiceProvider extends ServiceProvider
             $client->setDefaultOption('cookies', new SessionCookieJar($app['cookie']));
 
             CacheSubscriber::attach($client);
+            
+            // setup sesssions
+            $this->client->get('sessies/huidige');
 
             return $client;
         });
