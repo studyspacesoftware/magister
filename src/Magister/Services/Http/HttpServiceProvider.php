@@ -29,7 +29,7 @@ class HttpServiceProvider extends ServiceProvider
     protected function registerGuzzle()
     {
         $this->app->singleton('http', function ($app) {
-            $client = new Client(['base_url' => "https://{$app['school']}.magister.net/api/"]);
+            $client = new Client(['base_url' => "https://{$app['school']}.{$app['apidomain']}/api/"]);
 
             $client->setDefaultOption('exceptions', false);
             $client->setDefaultOption('headers/Authorization', 'Bearer '.$app['apikey']);
