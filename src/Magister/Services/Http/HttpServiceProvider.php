@@ -39,7 +39,7 @@ class HttpServiceProvider extends ServiceProvider
             CacheSubscriber::attach($client);
             
             // setup sesssions
-            $this->client->get('sessies/huidige');
+            $client->get('sessies/huidige');
 
             return $client;
         });
