@@ -55,10 +55,10 @@ class Magister extends Container implements ApplicationContract
      * @param string $username
      * @param string $password
      */
-    public function start($apiKey)
+    public function start($apiKey, $apiDomain, $school)
     {
         $kernel = new Kernel($this);
-
+        $this->registerBaseBindings($apiKey, $apiDomain, $school);
         $this->bindPathsInContainer();
 
         $kernel->bootstrap();
@@ -84,10 +84,12 @@ class Magister extends Container implements ApplicationContract
      *
      * @return void
      */
-    protected function registerBaseBindings($apikey)
+    protected function registerBaseBindings($apikey, $apiDomain, $school)
     {
         $this->bind('app', $this);
+        $this->bind('apidomain', $apiDomain);
         $this->bind('apikey', $apikey);
+        $this->bind('school', $school);
     }
 
     /**
