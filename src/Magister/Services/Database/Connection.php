@@ -79,8 +79,9 @@ class Connection implements ConnectionInterface
             // of the result set. Each element in the array will be a single
             // row from the response, and will either be an array or objects.
             $statement = $me->getClient()->get($query, ['query' => $bindings]);
+            $content = $statement->getBody()->getContents();
 
-            return $statement->json();
+            return json_decode($content, true);
         });
     }
 
