@@ -3,7 +3,6 @@
 namespace Magister\Services\Http;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Subscriber\Cache\CacheSubscriber;
 use Magister\Services\Support\ServiceProvider;
 
 /**
@@ -29,13 +28,13 @@ class HttpServiceProvider extends ServiceProvider
     protected function registerGuzzle()
     {
         $this->app->singleton('http', function ($app) {
-            $client = new Client(['base_url' => "https://{$app['school']}.{$app['apidomain']}/api/"]);
-
-            $client->setDefaultOption('headers/Authorization', 'Bearer '.$app['apikey']);
-
-            $client->setDefaultOption('cookies', new SessionCookieJar($app['cookie']));
-
-            CacheSubscriber::attach($client);
+            $client = new Client([
+                'base_url' => "https://{$app['school']}.{$app['apidomain']}/api/",
+                'headers' => [
+                    'Authorization' => 'Bearer '.$app['apikey'],
+                ],
+                'cookies' => new SessionCookieJar($app['cookie']),
+            ]);
 
             return $client;
         });
