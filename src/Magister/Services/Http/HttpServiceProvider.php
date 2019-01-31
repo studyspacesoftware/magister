@@ -29,7 +29,7 @@ class HttpServiceProvider extends ServiceProvider
     {
         $this->app->singleton('http', function ($app) {
             $client = new Client([
-                'base_url' => "https://{$app['school']}.{$app['apidomain']}/api/",
+                'base_uri' => "https://{$app['school']}.{$app['apidomain']}/api/",
                 'headers' => [
                     'Authorization' => 'Bearer '.$app['apikey'],
                 ],
